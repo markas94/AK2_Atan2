@@ -71,9 +71,25 @@ int main()
 		cout << endl;
 	}
 
+
+	//PIERWSZA LINIA ŒRODKOWA FA
+	int i_fa_w_linii;
+	for (i_fa_w_linii = 0; i_fa_w_linii < k - 2; i_fa_w_linii++)	//dla wiêkszoœci FA w jednej linii
+	{
+		fa[2][i_fa_w_linii].FullAdderSum((x[i_fa_w_linii] * y[2]), ha[i_fa_w_linii + 1].sum, ha[i_fa_w_linii].carry);
+		fa[2][i_fa_w_linii].FullAdderCOut((x[i_fa_w_linii] * y[2]), ha[i_fa_w_linii  + 1].sum, ha[i_fa_w_linii].carry);
+
+		cout << "fa[2][i] for i =  " << i_fa_w_linii << ": " << fa[2][i_fa_w_linii] << endl;
+	}
+	fa[2][i_fa_w_linii].FullAdderSum((x[i_fa_w_linii] * y[2]), (x[i_fa_w_linii + 1] * y[1]), ha[i_fa_w_linii].carry);	//ostatni FA w linii jest inny
+	fa[2][i_fa_w_linii].FullAdderCOut((x[i_fa_w_linii] * y[2]), (x[i_fa_w_linii + 1] * y[1]), ha[i_fa_w_linii].carry);
+
+	cout << "fa[2][i] for i =  " << i_fa_w_linii << ": " << fa[2][i_fa_w_linii] << endl;
+
+	//POZOSTA£E LINIE ŒRODKOWE FA	
 	int counter_i = 0;	//elementy FA (0-2) w jednej linii
 	int counter_j = 0; // iloœæ linii FA
-	int z_index = 2; //drugi skladnik mnozenie y ma w jednej linii przy mnozeniu staly indeks (np. a0x2)
+	int z_index = 3; //drugi skladnik mnozenie y ma w jednej linii przy mnozeniu staly indeks (np. a0x2)
 	for (int j = 0; j < k - 2; j++)		//iloœæ linii FA
 	{
 		int i;
@@ -82,10 +98,10 @@ int main()
 			fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), ha[i + 1].sum, ha[i].carry);
 			fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), ha[i + 1].sum, ha[i].carry);
 
-			if (j == 1)
+			/*if (j == 1)
 			{
 				cout << "fa[j + 2][i] for i =  " << i  << "and z_index = " << z_index << ": " << fa[j + 2][i] << endl;
-			}
+			}*/
 		}
 		fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), ha[i].carry);	//ostatni FA w linii jest inny
 		fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), ha[i].carry);
