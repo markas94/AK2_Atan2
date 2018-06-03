@@ -8,7 +8,7 @@ public:
 
 	HA();
 	//~HA();
-	
+
 	int HalfAdderSum(int x, int y)
 	{
 		this->x = x;
@@ -41,6 +41,7 @@ HA::HA()
 {
 	x = y = sum = carry = 2;
 }
+
 
 class FA
 {
