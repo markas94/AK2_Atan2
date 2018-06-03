@@ -5,12 +5,12 @@ using namespace std;
 
 int main()
 {
-	int k = 6; // IL. BITÓW
+	int k = 5; // IL. BITÓW
 
 	int* wynik = new int[2 * k];
 
-	// x = 101010
-	// y = 110010
+	// x = 01010
+	// y = 10010
 
 	int* x = new int[k];
 	int* y = new int[k];
@@ -30,8 +30,9 @@ int main()
 	int x4 = 0;
 	int y4 = 1;
 
-	int x5 = 1;
+	/*int x5 = 1;
 	int y5 = 1;
+	*/
 
 	x[0] = x0;
 	y[0] = y0;
@@ -48,8 +49,8 @@ int main()
 	x[4] = x4;
 	y[4] = y4;
 
-	x[5] = x5;
-	y[5] = y5;
+	/*x[5] = x5;
+	y[5] = y5;*/
 
 	HA* ha = new HA[k - 1];
 	FA** fa = new FA*[k - 2]; //iloœæ linii "œrodkowych" FA na schemacie (bez linii HA i bez koñcowej)
@@ -64,17 +65,10 @@ int main()
 
 	for (int i = 0; i < k - 1; i++) //generowanie pierwszej linii HA
 	{
-		cout << "HA" << i << ": " << endl;
-
 		int pomocnicza_x = x[i] * y[1];
 		int pomocnicza_y = x[i + 1] * y[0];
 		ha[i].HalfAdderSum(pomocnicza_x, pomocnicza_y);
 		ha[i].HalfAdderCarry(pomocnicza_x, pomocnicza_y);
-
-		cout << "Suma: " << ha[i].sum << endl;
-		cout << "Carry: " << ha[i].carry << endl;
-
-		cout << endl;
 	}
 
 
@@ -83,66 +77,71 @@ int main()
 	for (i_fa_w_linii = 0; i_fa_w_linii < k - 2; i_fa_w_linii++)	//dla wiêkszoœci FA w jednej linii
 	{
 		fa[2][i_fa_w_linii].FullAdderSum((x[i_fa_w_linii] * y[2]), ha[i_fa_w_linii + 1].sum, ha[i_fa_w_linii].carry);
-		fa[2][i_fa_w_linii].FullAdderCOut((x[i_fa_w_linii] * y[2]), ha[i_fa_w_linii  + 1].sum, ha[i_fa_w_linii].carry);
+		fa[2][i_fa_w_linii].FullAdderCOut((x[i_fa_w_linii] * y[2]), ha[i_fa_w_linii + 1].sum, ha[i_fa_w_linii].carry);
 
 	}
 	fa[2][i_fa_w_linii].FullAdderSum((x[i_fa_w_linii] * y[2]), (x[i_fa_w_linii + 1] * y[1]), ha[i_fa_w_linii].carry);	//ostatni FA w linii jest inny
 	fa[2][i_fa_w_linii].FullAdderCOut((x[i_fa_w_linii] * y[2]), (x[i_fa_w_linii + 1] * y[1]), ha[i_fa_w_linii].carry);
 
 	//POZOSTALE LINIE SRODKOWE FA	
-	int counter_i = 0;	//elementy FA (0-2) w jednej linii
+	int counter_i = i_fa_w_linii;	//elementy FA (0-2) w jednej linii
 	int counter_j = 0; // ilosc linii FA
-	int z_index = 3; //drugi skladnik mnozenie y ma w jednej linii przy mnozeniu staly indeks (np. a0x2)
-	for (int j = 1; j < k - 2; j++)		//iloœæ linii FA
+	if (k > 3)
 	{
-		int i;
-		for (i = 0; i < k - 2; i++)	//dla wiêkszoœci FA w jednej linii
+		int z_index = 3; //drugi skladnik mnozenie y ma w jednej linii przy mnozeniu staly indeks (np. a0x2)
+		for (int j = 1; j < k - 2; j++)		//iloœæ linii FA
 		{
-			fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), fa[j + 1][i + 1].sum, fa[j + 1][i].c_out);
-			fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), fa[j + 1][i + 1].sum, fa[j + 1][i].c_out);
+			int i;
+			for (i = 0; i < k - 2; i++)	//dla wiêkszoœci FA w jednej linii
+			{
+				fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), fa[j + 1][i + 1].sum, fa[j + 1][i].c_out);
+				fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), fa[j + 1][i + 1].sum, fa[j + 1][i].c_out);
+
+				/*if (j == 1)
+				{
+					cout << "fa[j + 2][i] for i =  " << i  << "and z_index = " << z_index << ": " << fa[j + 2][i] << endl;
+				}*/
+			}
+			fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), fa[j + 1][i].c_out);	//ostatni FA w linii jest inny
+			fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), fa[j + 1][i].c_out);
 
 			/*if (j == 1)
 			{
 				cout << "fa[j + 2][i] for i =  " << i  << "and z_index = " << z_index << ": " << fa[j + 2][i] << endl;
 			}*/
+
+			counter_i = i;
+			counter_j = j;
+			z_index++;
 		}
-		fa[j + 2][i].FullAdderSum((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), fa[j + 1][i].c_out);	//ostatni FA w linii jest inny
-		fa[j + 2][i].FullAdderCOut((x[i] * y[z_index]), (x[i + 1] * y[z_index - 1]), fa[j + 1][i].c_out);
-
-		/*if (j == 1)
-		{
-			cout << "fa[j + 2][i] for i =  " << i  << "and z_index = " << z_index << ": " << fa[j + 2][i] << endl;
-		}*/
-		
-		counter_i = i;
-		counter_j = j;
-		z_index++;
 	}
-
 	//OSTATNIA LINIA
-	ha_k.HalfAdderSum(fa[counter_j + 2][counter_i - counter_i].c_out, fa[counter_j + 2][(counter_i - counter_i)+1].sum);		// pojedynczy HA ostatniej linii
-	ha_k.HalfAdderCarry(fa[counter_j + 2][counter_i - counter_i].c_out, fa[counter_j + 2][(counter_i - counter_i)+1].sum);
-
-	/*for (int i = 0; i < k - 2; i++)
-	{
-		fa_k[i];
-	}*/
+	ha_k.HalfAdderSum(fa[counter_j + 2][counter_i - counter_i].c_out, fa[counter_j + 2][(counter_i - counter_i) + 1].sum);		// pojedynczy HA ostatniej linii
+	ha_k.HalfAdderCarry(fa[counter_j + 2][counter_i - counter_i].c_out, fa[counter_j + 2][(counter_i - counter_i) + 1].sum);
 
 	int fak_i = 0;
-	fa_k[fak_i].FullAdderSum(ha_k.carry, fa[counter_j + 2][(counter_i - counter_i) + 2].sum, fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);	//pierwszy FA koñcowy
-	fa_k[fak_i].FullAdderCOut(ha_k.carry, fa[counter_j + 2][(counter_i - counter_i) + 2].sum, fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);
-	int fak_srodkowe = 1;
-	for (fak_i = 1; fak_i < k - 3; fak_i++)
+	int fak_srodkowe_dla_wyniku = 1;	//to samo co w int fak_srodkowe, ale globalnie
+	if (k == 3)
 	{
-		fa_k[fak_i].FullAdderSum(fa_k[fak_i - 1].c_out, fa[counter_j + 2][fak_srodkowe + 2].sum, fa[counter_j + 2][fak_srodkowe + 1].c_out);	//œrodkowe FA koñcowe 
-		fa_k[fak_i].FullAdderCOut(fa_k[fak_i - 1].c_out, fa[counter_j + 2][fak_srodkowe + 2].sum, fa[counter_j + 2][fak_srodkowe + 1].c_out);
-		fak_srodkowe++;
+		fa_k[fak_i].FullAdderSum(ha_k.carry, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);		//ostatni FA koñcowy
+		fa_k[fak_i].FullAdderCOut(ha_k.carry, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);
 	}
-	fa_k[fak_i].FullAdderSum(fa_k[fak_i - 1].c_out, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][fak_srodkowe + 1].c_out);		//ostatni FA koñcowy
-	fa_k[fak_i].FullAdderCOut(fa_k[fak_i - 1].c_out, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][fak_srodkowe + 1].c_out);
-
-	cout << "fa_k[fak_i] for fak_i = " << fak_i << "is: " << fa_k[fak_i] << endl;
-
+	else if (k > 3)
+	{
+		fa_k[fak_i].FullAdderSum(ha_k.carry, fa[counter_j + 2][(counter_i - counter_i) + 2].sum, fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);	//pierwszy FA koñcowy
+		fa_k[fak_i].FullAdderCOut(ha_k.carry, fa[counter_j + 2][(counter_i - counter_i) + 2].sum, fa[counter_j + 2][(counter_i - counter_i) + 1].c_out);
+		int fak_srodkowe = 1;
+		for (fak_i = 1; fak_i < k - 3; fak_i++)
+		{
+			fa_k[fak_i].FullAdderSum(fa_k[fak_i - 1].c_out, fa[counter_j + 2][fak_srodkowe + 2].sum, fa[counter_j + 2][fak_srodkowe + 1].c_out);	//œrodkowe FA koñcowe 
+			fa_k[fak_i].FullAdderCOut(fa_k[fak_i - 1].c_out, fa[counter_j + 2][fak_srodkowe + 2].sum, fa[counter_j + 2][fak_srodkowe + 1].c_out);
+			fak_srodkowe++;
+		}
+		fa_k[fak_i].FullAdderSum(fa_k[fak_i - 1].c_out, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][fak_srodkowe + 1].c_out);		//ostatni FA koñcowy
+		fa_k[fak_i].FullAdderCOut(fa_k[fak_i - 1].c_out, (x[counter_i + 1] * y[counter_j + 2]), fa[counter_j + 2][fak_srodkowe + 1].c_out);
+		fak_srodkowe_dla_wyniku = fak_srodkowe;
+	}
+	/*
 	//***Wydruk testowy***
 	//FA
 	for (int i = 0; i < k - 2; i++)
@@ -179,6 +178,7 @@ int main()
 		cout << endl;
 	}
 	//*********
+	*/
 
 	//WYNIK
 
@@ -194,15 +194,23 @@ int main()
 		wynik[i] = fa[i][0].sum;
 	}
 	wynik[k] = ha_k.sum;
-	int zeruj_warun = 0;
-	for (int i = k + 1; zeruj_warun < fak_srodkowe; i++)
-	{
-		wynik[i] = fa_k[i - (k + 1)].sum;
-		zeruj_warun++;
-	}
-	wynik[k + fak_srodkowe + 1] = fa_k[fak_i].sum;
-	wynik[k + fak_srodkowe + 2] = fa_k[fak_i].c_out;
 
+	if (k == 3)
+	{
+		wynik[k + 1] = fa_k[fak_i].sum;
+		wynik[k + 2] = fa_k[fak_i].c_out;
+	}
+	else if (k > 3)
+	{
+		int zeruj_warun = 0;
+		for (int i = k + 1; zeruj_warun < fak_srodkowe_dla_wyniku; i++)
+		{
+			wynik[i] = fa_k[i - (k + 1)].sum;
+			zeruj_warun++;
+		}
+		wynik[k + fak_srodkowe_dla_wyniku + 1] = fa_k[fak_i].sum;
+		wynik[k + fak_srodkowe_dla_wyniku + 2] = fa_k[fak_i].c_out;
+	}
 	//drukuj wynik
 	cout << "Wynik mnozenia: ";
 	for (int i = (2 * k) - 1; i >= 0; i--)
@@ -211,18 +219,31 @@ int main()
 	}
 	cout << endl;
 
-
-	delete[] x;
-	delete[] y;
-
-	delete[] ha;
-	delete[] fa;
-
-	delete[] fa_k;
-
-	delete[] wynik;
-
 	cout << endl;
 	system("PAUSE");
+
+	//ZWALNIANIE PAMIECI
+	wynik = nullptr;
+	delete[] wynik;
+	
+	fa_k = nullptr;
+	delete[] fa_k;
+
+	for (int i = 0; i < k - 2; i++)
+	{
+		fa[i+2] = nullptr;
+		delete[] fa[i + 2];
+	}
+	fa = nullptr;
+	delete[] fa;
+	
+	ha = nullptr;
+	delete[] ha;
+	
+	x = nullptr;
+	delete [] x;
+	y = nullptr;
+	delete [] y;
+		
 	return 0;
 }
